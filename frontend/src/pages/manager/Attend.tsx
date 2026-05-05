@@ -154,7 +154,12 @@ const Attend = () => {
             </p>
             <div className="flex flex-row  w-[calc(100vw-390px)] p-3 bg-[#F1F1F1] rounded-xl gap-3 justify-start items-start flex-wrap content-start ">
               {userList
-                .filter((user) => user.deptId === dept.deptId)
+                .filter(
+                  (user) =>
+                    user.deptId === dept.deptId &&
+                    user.userName.includes(name.trim()),
+                )
+
                 .map((user) => (
                   <div key={user.userId}>
                     <button
