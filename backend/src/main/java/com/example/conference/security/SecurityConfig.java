@@ -46,7 +46,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173","https://momentum-sigma-rosy.vercel.app","https://api.momentum57.cloud","https://conference.momentum57.cloud")); // Vite
+        config.setAllowedOrigins(List.of("http://localhost:5173","https://momentum-sigma-rosy.vercel.app","https://conferenceapi.momentum57.cloud","https://conference.momentum57.cloud")); // Vite
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(false);
