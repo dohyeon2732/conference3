@@ -19,7 +19,7 @@ export const useStateApi = {
     onError: (error: Event) => void,
   ) => {
     const eventSource = new EventSource(
-      `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'}/state/stream`,
+      `${import.meta.env.VITE_API_BASE_URL ?? 'https://conferenceapi.momentum57.cloud'}/state/stream`,
     );
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
