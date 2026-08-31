@@ -40,6 +40,11 @@ public class UserController {
         return userService.login(dto);
     }
 
+    @PostMapping("/admin-login")
+    public AdminLoginResponseDTO adminLogin(@RequestBody AdminLoginRequestDTO dto) {
+        return userService.adminLogin(dto);
+    }
+
     @GetMapping("/me")
     public UserResponseDTO me(HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");

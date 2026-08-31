@@ -76,6 +76,19 @@ public class UserService {
 
     }
 
+    public AdminLoginResponseDTO adminLogin(AdminLoginRequestDTO dto) {
+        if (!"chdgkrtodghl".equals(dto.getPassword()) && !"총학생회".equals(dto.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        String token = jwtTokenProvider.createToken(0L, "admin", "ADMIN");
+
+        return AdminLoginResponseDTO.builder()
+                .accessToken(token)
+                .role("ADMIN")
+                .build();
+    }
+
 
     public void changePassword(Long userId, ChangePasswordRequestDto dto) {
         Users user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("user not found"));

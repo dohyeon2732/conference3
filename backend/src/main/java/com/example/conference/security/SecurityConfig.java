@@ -5,6 +5,7 @@ import com.example.conference.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -33,7 +34,14 @@ public class SecurityConfig {
 
                 .sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .authorizeHttpRequests(auth->auth.requestMatchers("/agenda/**","/attendance/**","/vote/result/**","/user/login","/user/**","/state/**","/dept/**","/user/count/stream","/user/count","/user/dept","/manager/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(auth->auth.requestMatchers("/user/login","/user/admin-login","/dept","/user/dept/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html").permitAll()
+                        .requestMatchers("/user/me","/user/password").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/state","/state/stream","/agenda/*","/vote/result/**","/attendance/agenda/*/user/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/vote").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/vote").authenticated()
+                        .requestMatchers("/state/**","/vote/**","/agenda/**","/attendance/**","/user/**","/dept/**","/manager/**").hasRole("ADMIN")
+
+                        .anyRequest().authenticated())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .addFilterBefore(

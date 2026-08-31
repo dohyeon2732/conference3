@@ -20,9 +20,14 @@ public class JwtTokenProvider {
             Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
     public String createToken(Long userId, String userName) {
+        return createToken(userId, userName, "USER");
+    }
+
+    public String createToken(Long userId, String userName, String role) {
         return Jwts.builder()
                 .claim("userId", userId)
                 .claim("userName", userName)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(KEY, SignatureAlgorithm.HS256)
