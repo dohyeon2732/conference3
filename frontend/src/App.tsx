@@ -6,7 +6,7 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
-      api.get('/users/me').catch(() => {
+      api.get('/user/me').catch(() => {
         localStorage.removeItem('accessToken');
         window.location.href = '/';
       });

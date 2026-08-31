@@ -31,7 +31,7 @@ export const useUserApi = {
     onError: (error: Event) => void,
   ) => {
     const eventSource = new EventSource(
-      `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'}/user/count/stream`,
+      `${import.meta.env.VITE_API_BASE_URL ?? 'https://conferenceapi.momentum57.cloud'}/user/count/stream`,
     );
 
     eventSource.onmessage = (event) => {
@@ -52,7 +52,7 @@ export const useUserApi = {
     onError: (error: Event) => void,
   ) => {
     const eventSource = new EventSource(
-      `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'}/user/attendance/stream`,
+      `${import.meta.env.VITE_API_BASE_URL ?? 'https://conferenceapi.momentum57.cloud'}/user/attendance/stream`,
     );
 
     eventSource.onmessage = (event) => {
