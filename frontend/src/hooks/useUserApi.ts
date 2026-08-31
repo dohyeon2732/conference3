@@ -1,5 +1,18 @@
 import api from '../apis/axios';
 
+const getStreamUrl = (path: string) => {
+  const baseUrl =
+    import.meta.env.VITE_API_BASE_URL ?? 'https://conferenceapi.momentum57.cloud';
+  const url = new URL(path, baseUrl);
+  const token = localStorage.getItem('accessToken');
+
+  if (token) {
+    url.searchParams.set('accessToken', token);
+  }
+
+  return url.toString();
+};
+
 export const useUserApi = {
   login: (data: { deptName: string; userName: string; password: string }) =>
     api.post('user/login', data),
@@ -31,9 +44,7 @@ export const useUserApi = {
     onMessage: (data: { totalCount: number; attendanceCount: number }) => void,
     onError: (error: Event) => void,
   ) => {
-    const eventSource = new EventSource(
-      `${import.meta.env.VITE_API_BASE_URL ?? 'https://conferenceapi.momentum57.cloud'}/user/count/stream`,
-    );
+    const eventSource = new EventSource(getStreamUrl('/user/count/stream'));
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -53,7 +64,7 @@ export const useUserApi = {
     onError: (error: Event) => void,
   ) => {
     const eventSource = new EventSource(
-      `${import.meta.env.VITE_API_BASE_URL ?? 'https://conferenceapi.momentum57.cloud'}/user/attendance/stream`,
+      getStreamUrl('/user/attendance/stream'),
     );
 
     eventSource.onmessage = (event) => {

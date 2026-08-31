@@ -2,6 +2,19 @@ import api from '../apis/axios';
 
 export type StateValue = 'PROGRESS' | 'STOP' | 'VOTING' | 'RESULT';
 
+const getStreamUrl = (path: string) => {
+  const baseUrl =
+    import.meta.env.VITE_API_BASE_URL ?? 'https://conferenceapi.momentum57.cloud';
+  const url = new URL(path, baseUrl);
+  const token = localStorage.getItem('accessToken');
+
+  if (token) {
+    url.searchParams.set('accessToken', token);
+  }
+
+  return url.toString();
+};
+
 export const useStateApi = {
   state: () => api.get('/state'),
   change: (data: {
@@ -18,9 +31,7 @@ export const useStateApi = {
     }) => void,
     onError: (error: Event) => void,
   ) => {
-    const eventSource = new EventSource(
-      `${import.meta.env.VITE_API_BASE_URL ?? 'https://conferenceapi.momentum57.cloud'}/state/stream`,
-    );
+    const eventSource = new EventSource(getStreamUrl('/state/stream'));
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       onMessage(data);
