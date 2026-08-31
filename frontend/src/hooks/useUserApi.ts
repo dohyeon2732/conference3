@@ -3,6 +3,7 @@ import api from '../apis/axios';
 export const useUserApi = {
   login: (data: { deptName: string; userName: string; password: string }) =>
     api.post('user/login', data),
+  adminLogin: (data: { password: string }) => api.post('/user/admin-login', data),
 
   me: () => api.get('/user/me'),
   findAll: () => api.get('/user'),

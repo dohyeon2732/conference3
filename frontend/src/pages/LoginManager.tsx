@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import BlueButton from '../components/button/BlueButton';
 import { useNavigate } from 'react-router-dom';
 import PopUpCard from '../components/PopUpCard';
+import { useUserApi } from '../hooks/useUserApi';
 
 const LoginManager = () => {
   useEffect(() => {
@@ -13,9 +14,17 @@ const LoginManager = () => {
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
-    if (password === 'chdgkrtodghl' || password === '총학생회') {
+    try {
+      const res = await useUserApi.adminLogin({ password });
+      const { accessToken } = res.data;
+
+      if (!accessToken) {
+        throw new Error('accessToken이 없습니다.');
+      }
+
+      localStorage.setItem('accessToken', accessToken);
       navigate('/manager/attend'); //home
-    } else {
+    } catch {
       setPopup1(true);
     }
   };
