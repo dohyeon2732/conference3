@@ -28,13 +28,18 @@ public class JwtAuthFilter  extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
+        String token = null;
 
-        // Authorization 헤더가 없는 경우 → 그냥 통과
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (header != null && header.startsWith("Bearer ")) {
+            token = header.substring(7); // "Bearer " 제거
+        } else {
+            token = request.getParameter("accessToken");
+        }
+
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
-        String token = header.substring(7); // "Bearer " 제거
 
         if(token.isBlank()||token.equals("null")||token.equals("undefined")) {
             filterChain.doFilter(request, response);

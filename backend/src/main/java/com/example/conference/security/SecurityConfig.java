@@ -36,7 +36,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth->auth.requestMatchers("/user/login","/user/admin-login","/dept","/user/dept/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html").permitAll()
                         .requestMatchers("/user/me","/user/password").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/state","/state/stream","/agenda/*","/vote/result/**","/attendance/agenda/*/user/*").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/state","/state/stream","/user/count/stream","/user/attendance/stream","/agenda/*","/vote/result/**","/attendance/agenda/*/user/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/vote").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/vote").authenticated()
                         .requestMatchers("/state/**","/vote/**","/agenda/**","/attendance/**","/user/**","/dept/**","/manager/**").hasRole("ADMIN")
