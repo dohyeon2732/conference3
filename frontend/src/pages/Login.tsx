@@ -102,7 +102,7 @@ const Login = () => {
           <br />
           전체학생대표자회의
           <br />
-          투표 시스템
+          의결 시스템
         </p>
       </button>
       <div className="flex flex-col gap-3">
