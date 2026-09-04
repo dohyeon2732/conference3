@@ -14,7 +14,7 @@ const Result = () => {
     voteValue: 'AGREE' | 'DISAGREE' | 'ABSTAIN' | null;
   };
 
-  const { state, attendCount, currentAgendaId } = useManagerRealtime();
+  const { state, currentAgendaId } = useManagerRealtime();
   // 'PROGRESS': 준비중, 'VOTING': 의결, 'RESULT': 결과
 
   const [voteResult, setVoteResult] = useState<{
@@ -39,6 +39,10 @@ const Result = () => {
       emergency: boolean;
     }[]
   >([]);
+
+  const votingRightCount = userList.filter(
+    (user) => user.attend && !user.emergency,
+  ).length;
 
   const getVoteColor = (voteValue: AttendanceVote['voteValue']) => {
     if (voteValue === 'AGREE') return 'text-[#57AA5A]';
@@ -224,7 +228,7 @@ const Result = () => {
           {state === 'RESULT' && (
             <div className="flex flex-col gap-10 justify-center items-center mt-20">
               <p className="text-white text-6xl font-bold">
-                의결권 {attendCount}명
+                의결권 {votingRightCount}명
               </p>
               <div className="flex flex-col gap-5">
                 <p className="text-[#57AA5A] text-6xl font-bold">
