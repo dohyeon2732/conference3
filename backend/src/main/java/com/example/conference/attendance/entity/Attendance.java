@@ -6,6 +6,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_attendance_agenda_user",
+                        columnNames = {"agenda_id", "user_id"}
+                )
+        }
+)
 @Getter
 @Setter
 @Builder
@@ -17,12 +25,12 @@ public class Attendance {
     private Long attendanceId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agenda_id")
+    @JoinColumn(name = "agenda_id", nullable = false)
     private Agenda agenda;
 
 }

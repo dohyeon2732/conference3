@@ -5,6 +5,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_vote_attendance",
+                        columnNames = {"attendance_id"}
+                )
+        }
+)
 @Getter
 @Setter
 @Builder
@@ -21,7 +29,7 @@ public class Vote {
     private VoteType voteValue;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "attendance_id")
+    @JoinColumn(name = "attendance_id", nullable = false)
     private Attendance attendance;
 
     public void changeVoteValue(VoteType voteValue){
