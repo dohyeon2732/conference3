@@ -441,7 +441,7 @@ const Agenda = () => {
               </div>
               <div className="flex felx-row gap-2">
                 <div className="bg-[#A3A3A3] w-[30px] h-[30px] rounded-full" />
-                <p className="text-zinc-800 text-2xl font-bold">불참/비대위</p>
+                <p className="text-zinc-800 text-2xl font-bold">비대위</p>
               </div>
             </div>
           </div>
@@ -460,10 +460,10 @@ const Agenda = () => {
             <div className="flex flex-row  w-[calc(100vw-390px)] p-3 bg-[#F1F1F1] rounded-xl gap-3 justify-start items-start flex-wrap content-start ">
               {userList
                 .filter((user) => user.deptId === dept.deptId)
+                .filter((user) => user.attend)
                 .map((user) => {
                   const voteValue = voteMap.get(user.userId) ?? null;
 
-                  console.log(user.attend, user.emergency);
                   return (
                     <div key={user.userId}>
                       <div
