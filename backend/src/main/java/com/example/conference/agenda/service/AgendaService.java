@@ -88,11 +88,23 @@ public class AgendaService {
         var state = stateRepository.findByStateId(CURRENT_STATE_ID)
                 .orElseThrow(() -> new IllegalStateException("conference state not found"));
 
-        if (state.getCurrentState() == ConferenceState.VOTING) {
-            state.change(ConferenceState.RESULT, id);
+        Long targetAgendaId = id;
+        if (state.getCurrentState() == ConferenceState.VOTING && state.getCurrentAgendaId() != null) {
+            targetAgendaId = state.getCurrentAgendaId();
         }
 
-        var attendances = attendanceRepository.findByAgendaIdForUpdate(id);
+        if (targetAgendaId == null || targetAgendaId <= 0) {
+            throw new IllegalArgumentException("agendaId is required");
+        }
+
+        agendaRepository.findById(targetAgendaId)
+                .orElseThrow(() -> new IllegalArgumentException("agenda not found"));
+
+        if (state.getCurrentState() == ConferenceState.VOTING) {
+            state.change(ConferenceState.RESULT, targetAgendaId);
+        }
+
+        var attendances = attendanceRepository.findByAgendaIdForUpdate(targetAgendaId);
 
         for (var attendance : attendances) {
             if (voteRepository.existsByAttendanceAttendanceId(attendance.getAttendanceId())) continue;
@@ -103,7 +115,7 @@ public class AgendaService {
                     .build());
         }
 
-        agendaRepository.closeById(id);
+        agendaRepository.closeById(targetAgendaId);
         stateSseService.send(StateResponseDTO.from(state));
     }
 
