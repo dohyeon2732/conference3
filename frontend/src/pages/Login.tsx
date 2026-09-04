@@ -6,6 +6,13 @@ import { useUserApi } from '../hooks/useUserApi';
 import PopUpCard from '../components/PopUpCard';
 import { useDeptApi } from '../hooks/useDeptApi';
 
+type LoginUserOption = {
+  userId: number;
+  userName: string;
+  userPos: string;
+  label: string;
+};
+
 const Login = () => {
   useEffect(() => {
     document.body.className = 'mobile';
@@ -17,9 +24,9 @@ const Login = () => {
   const [deptList, setDeptList] = useState<{ id: number; deptName: string }[]>(
     [],
   );
-  const [userList, setUserList] = useState<string[]>([]);
+  const [userList, setUserList] = useState<LoginUserOption[]>([]);
   const [dept, setDept] = useState('');
-  const [name, setName] = useState('');
+  const [selectedUserLabel, setSelectedUserLabel] = useState('');
   const [password, setPassword] = useState('');
 
   useEffect(() => {
@@ -44,7 +51,7 @@ const Login = () => {
   useEffect(() => {
     if (!dept) {
       setUserList([]);
-      setName('');
+      setSelectedUserLabel('');
       return;
     }
 
@@ -56,10 +63,15 @@ const Login = () => {
         const res = await useUserApi.findByDept({ deptId: selectedDept.id });
         setUserList(
           res.data.map(
-            (u: { userName: string; userPos: string }) =>
-              u.userPos + ' / ' + u.userName,
+            (u: { userId: number; userName: string; userPos: string }) => ({
+              userId: u.userId,
+              userName: u.userName,
+              userPos: u.userPos,
+              label: `${u.userPos} / ${u.userName}`,
+            }),
           ),
         );
+        setSelectedUserLabel('');
         console.log('user list', res.data);
       } catch (e) {
         console.error('user list load fail', e);
@@ -70,9 +82,15 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
+      const selectedUser = userList.find(
+        (user) => user.label === selectedUserLabel,
+      );
+      const userNameForLogin =
+        selectedUser?.userName ?? selectedUserLabel.split(' / ').at(-1) ?? '';
+
       const res = await useUserApi.login({
         deptName: dept,
-        userName: name,
+        userName: userNameForLogin.trim(),
         password: password,
       });
 
@@ -128,9 +146,9 @@ const Login = () => {
           </p>
           <ComboBox
             placeholder="이름을 선택하세요."
-            name={userList}
-            value={name}
-            onChange={setName}
+            name={userList.map((user) => user.label)}
+            value={selectedUserLabel}
+            onChange={setSelectedUserLabel}
           />
         </div>
         <div className="flex flex-row items-center justify-center gap-3.5">

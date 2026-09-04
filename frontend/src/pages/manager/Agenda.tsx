@@ -172,12 +172,12 @@ const Agenda = () => {
         agendaMinimum: countOption ? true : false,
       });
       setAgendaId(res.data.agendaId);
+      await useAttendanceApi.create({
+        agendaId: res.data.agendaId,
+      });
       await useStateApi.change({
         currentState: 'VOTING',
         currentAgendaId: res.data.agendaId,
-      });
-      await useAttendanceApi.create({
-        agendaId: res.data.agendaId,
       });
       fetchAttendanceList(res.data.agendaId);
     } catch (e) {

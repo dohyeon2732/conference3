@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import MobileTopBar from '../components/MobileTopBar';
 import { useUserApi } from '../hooks/useUserApi';
 import { useUserRealtime } from '../contexts/UserRealtimeContext';
@@ -7,6 +7,7 @@ import { useVoteApi } from '../hooks/useVoteApi';
 import { useAttendanceApi } from '../hooks/useAttendanceApi';
 
 type VoteValue = 'AGREE' | 'DISAGREE' | 'ABSTAIN' | null;
+type SelectedVoteValue = Exclude<VoteValue, null>;
 
 const Home = () => {
   const { state, myAttendance, currentAgendaId } = useUserRealtime();
@@ -18,13 +19,12 @@ const Home = () => {
   const [bidae, setBidae] = useState(false);
 
   const [opinion, setOpinion] = useState<VoteValue | null>(null);
-  const [isVoted, setIsVoted] = useState(false);
-  const isVotedRef = useRef(false);
+  const [isSubmittingVote, setIsSubmittingVote] = useState(false);
   const [agendaName, setAgendaName] = useState('');
   const [userName, setUserName] = useState('');
   const [userDept, setUserDept] = useState('');
   const [userId, setUserId] = useState(0);
-  const [attendanceId, setAttendanceId] = useState(0);
+
   useEffect(() => {
     {
       const fetchMe = async () => {
@@ -42,7 +42,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const fetchAttendanceId = async () => {
+    const fetchMyVote = async () => {
       if (currentAgendaId === null || currentAgendaId === 0 || userId === 0)
         return;
 
@@ -51,37 +51,15 @@ const Home = () => {
           agendaId: currentAgendaId,
           userId: userId,
         });
-        setAttendanceId(res.data.attendanceId);
+        setOpinion(res.data.voteValue ?? null);
       } catch (e) {
         console.error(e);
       }
     };
-    fetchAttendanceId();
+    fetchMyVote();
   }, [currentAgendaId, userId]);
 
-  // useEffect(() => {
-  //   const sendResult = async () => {
-  //     if (state === 'RESULT') {
-  //       try {
-  //         const voteValue = opinion ?? 'ABSTAIN';
-
-  //         console.log(voteValue);
-
-  //         const res = await useVoteApi.make({
-  //           attendanceId: attendanceId,
-  //           voteValue: voteValue,
-  //         });
-  //         setOpinion(null);
-  //       } catch (e) {
-  //         console.error(e);
-  //       }
-  //     }
-  //   };
-  //   sendResult();
-  // }, [state]);
-
   useEffect(() => {
-    setIsVoted(false);
     setOpinion(null);
   }, [currentAgendaId]);
 
@@ -112,46 +90,22 @@ const Home = () => {
     }
   }, [userId]);
 
-  useEffect(() => {
-    const sendResult = async () => {
-      try {
-        const voteValue = opinion ?? 'ABSTAIN';
-        console.log(voteValue, 'attend: ', attendanceId, ' voted :', isVoted);
+  const handleVote = async (voteValue: SelectedVoteValue) => {
+    if (state !== 'VOTING' || isSubmittingVote) return;
 
-        if (attendanceId !== 0) {
-          if (!isVotedRef.current) {
-            isVotedRef.current = true;
-            try {
-              await useVoteApi.make({
-                attendanceId,
-                voteValue: voteValue,
-              });
-              setIsVoted(true);
-            } catch (e) {
-              isVotedRef.current = false;
-              throw e;
-            }
-          } else {
-            await useVoteApi.change({
-              attendanceId,
-              voteValue: voteValue,
-            });
-            // console.log('change');
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    sendResult();
-  }, [opinion]);
+    const previousOpinion = opinion;
+    setOpinion(voteValue);
+    setIsSubmittingVote(true);
 
-  useEffect(() => {
-    if (state === 'RESULT') {
-      setIsVoted(false);
-      isVotedRef.current = false;
+    try {
+      await useVoteApi.cast({ voteValue });
+    } catch (e) {
+      setOpinion(previousOpinion);
+      console.error(e);
+    } finally {
+      setIsSubmittingVote(false);
     }
-  }, [state]);
+  };
 
   return (
     <div className="w-[393px] flex flex-col items-center justify-center">
@@ -226,24 +180,27 @@ const Home = () => {
           <div className="flex flex-col gap-10">
             <button
               onClick={() => {
-                setOpinion('AGREE');
+                handleVote('AGREE');
               }}
+              disabled={isSubmittingVote}
               className={`w-96 h-28  rounded-lg justify-center items-center ${opinion === 'AGREE' || opinion === null ? 'bg-[#57AA5A]' : 'bg-[#8E8E8E]'}`}
             >
               <p className="text-white text-4xl font-semibold">찬성</p>
             </button>
             <button
               onClick={() => {
-                setOpinion('DISAGREE');
+                handleVote('DISAGREE');
               }}
+              disabled={isSubmittingVote}
               className={`w-96 h-28  rounded-lg justify-center items-center ${opinion === 'DISAGREE' || opinion === null ? 'bg-[#F74040]' : 'bg-[#8E8E8E]'}`}
             >
               <p className="text-white text-4xl font-semibold">반대</p>
             </button>
             <button
               onClick={() => {
-                setOpinion('ABSTAIN');
+                handleVote('ABSTAIN');
               }}
+              disabled={isSubmittingVote}
               className={`w-96 h-28  rounded-lg justify-center items-center ${opinion === 'ABSTAIN' || opinion === null ? 'bg-[#FBA650]' : 'bg-[#8E8E8E]'}`}
             >
               <p className="text-white text-4xl font-semibold">기권</p>

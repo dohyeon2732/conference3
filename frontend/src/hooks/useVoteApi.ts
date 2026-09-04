@@ -7,6 +7,7 @@ export const useVoteApi = {
     api.post('/vote', data),
   change: (data: { attendanceId: number; voteValue: VoteValue }) =>
     api.put('/vote', data),
+  cast: (data: { voteValue: VoteValue }) => api.post('/vote/cast', data),
 
   result: (data: { agendaId: number }) =>
     api.get(`/vote/result/${data.agendaId}`),

@@ -32,6 +32,7 @@ public class AttendanceService {
 
         for (var user : users) {
             if (user.isEmergency()||!(user.isAttend())) continue;
+            if (attendanceRepository.existsByUserUserIdAndAgendaAgendaId(user.getUserId(), agenda.getAgendaId())) continue;
             var attendance = Attendance.builder()
                     .user(user)
                     .agenda(agenda)
@@ -89,7 +90,14 @@ public class AttendanceService {
                 .findByUserUserIdAndAgendaAgendaId(userId,agendaId)
                 .orElseThrow(()->new IllegalArgumentException("attendance not found"));
 
-        return AttendanceResultResponseDTO.from(attendance);
+        var vote = voteRepository.findByAttendanceAttendanceId(attendance.getAttendanceId());
+
+        return AttendanceResultResponseDTO.builder()
+                .attendanceId(attendance.getAttendanceId())
+                .agendaId(attendance.getAgenda().getAgendaId())
+                .userId(attendance.getUser().getUserId())
+                .voteValue(vote.map(Vote::getVoteValue).orElse(null))
+                .build();
     }
 
 }
