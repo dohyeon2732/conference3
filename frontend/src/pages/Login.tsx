@@ -54,7 +54,12 @@ const Login = () => {
         if (!selectedDept) return;
 
         const res = await useUserApi.findByDept({ deptId: selectedDept.id });
-        setUserList(res.data.map((u: { userName: string }) => u.userName));
+        setUserList(
+          res.data.map(
+            (u: { userName: string; userPos: string }) =>
+              u.userPos + ' / ' + u.userName,
+          ),
+        );
         console.log('user list', res.data);
       } catch (e) {
         console.error('user list load fail', e);
