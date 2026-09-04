@@ -26,6 +26,9 @@ public class AgendaController {
     @PutMapping("/close/{id}")
     public void closeById(@PathVariable Long id){agendaService.close(id);}
 
+    @PostMapping("/close/{id}")
+    public void closeByIdPost(@PathVariable Long id){agendaService.close(id);}
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {agendaService.delete(id);}
 
