@@ -107,12 +107,7 @@ const Home = () => {
         if (!attendanceId) {
           throw castError;
         }
-
-        try {
-          await useVoteApi.make({ attendanceId, voteValue });
-        } catch {
-          await useVoteApi.change({ attendanceId, voteValue });
-        }
+        await useVoteApi.make({ attendanceId, voteValue });
       }
     } catch (e) {
       setOpinion(previousOpinion);

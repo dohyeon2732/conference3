@@ -30,16 +30,17 @@ public class VoteService {
         var attendance = attendanceRepository.findById(dto.getAttendanceId())
                 .orElseThrow(()->new IllegalArgumentException("attendance X"));
 
-        if(voteRepository.existsByAttendanceAttendanceId(dto.getAttendanceId())){
-            throw new IllegalArgumentException("이미 개설된 투표");
-        }
-
-        var vote = Vote.builder()
-                .attendance(attendance)
-                .voteValue(dto.getVoteValue())
-                .build();
-
-        var saved = voteRepository.save(vote);
+        var saved = voteRepository.findByAttendanceAttendanceId(dto.getAttendanceId())
+                .map(existingVote -> {
+                    existingVote.changeVoteValue(dto.getVoteValue());
+                    return existingVote;
+                })
+                .orElseGet(() -> voteRepository.save(
+                        Vote.builder()
+                                .attendance(attendance)
+                                .voteValue(dto.getVoteValue())
+                                .build()
+                ));
 
         return VoteResponseDTO.builder()
                 .voteId(saved.getVoteId())
