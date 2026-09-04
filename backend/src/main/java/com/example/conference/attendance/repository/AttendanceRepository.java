@@ -15,6 +15,13 @@ public interface AttendanceRepository extends JpaRepository<Attendance,Long> {
 
     List<Attendance> findByAgendaAgendaId(Long agendaId);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select a from Attendance a
+            where a.agenda.agendaId = :agendaId
+            """)
+    List<Attendance> findByAgendaIdForUpdate(@Param("agendaId") Long agendaId);
+
     boolean existsByUserUserIdAndAgendaAgendaId(Long userId, Long agendaId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

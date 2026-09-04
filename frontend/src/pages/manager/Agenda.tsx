@@ -208,10 +208,6 @@ const Agenda = () => {
   const closeAgenda = async () => {
     try {
       await useAgendaApi.close({ agendaId });
-      await useStateApi.change({
-        currentState: 'RESULT',
-        currentAgendaId: agendaId,
-      });
     } catch (e) {
       console.error('의결 종료 실패', e);
     }
