@@ -138,7 +138,6 @@ const Agenda = () => {
     try {
       const res = await useAttendanceApi.findByAgendaId({ agendaId });
       setAttendanceList(res.data);
-      console.log('출석부 리스트', res.data);
     } catch (e) {
       console.error('출석부 조회 실패', e);
     }
@@ -147,7 +146,6 @@ const Agenda = () => {
   const fetchVoteResult = async (agendaId: number) => {
     try {
       const res = await useVoteApi.result({ agendaId });
-      console.log('투표 결과', res.data);
       setVoteResult({
         agreeCount: res.data.agreeCount,
         disagreeCount: res.data.disagreeCount,
