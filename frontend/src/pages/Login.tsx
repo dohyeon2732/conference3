@@ -33,14 +33,12 @@ const Login = () => {
     const fetchDeptList = async () => {
       try {
         const res = await useDeptApi.findAll();
-        console.log('dept list', res.data);
         setDeptList(
           res.data.map((k: { deptId: number; deptName: string }) => ({
             id: k.deptId,
             deptName: k.deptName,
           })),
         );
-        console.log('dept list2', deptList);
       } catch (e) {
         console.error('Dept list empty', e);
       }
@@ -72,7 +70,6 @@ const Login = () => {
           ),
         );
         setSelectedUserLabel('');
-        console.log('user list', res.data);
       } catch (e) {
         console.error('user list load fail', e);
       }
