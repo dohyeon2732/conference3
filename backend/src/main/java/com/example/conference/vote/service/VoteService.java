@@ -71,7 +71,7 @@ public class VoteService {
             throw new IllegalArgumentException("voteValue is required");
         }
 
-        var state = stateRepository.findById(CURRENT_STATE_ID)
+        var state = stateRepository.findByStateId(CURRENT_STATE_ID)
                 .orElseThrow(() -> new IllegalStateException("conference state not found"));
 
         if (state.getCurrentState() != ConferenceState.VOTING || state.getCurrentAgendaId() == null) {
