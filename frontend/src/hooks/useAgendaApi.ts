@@ -8,7 +8,7 @@ export const useAgendaApi = {
     agendaMinimum: boolean;
   }) => api.post('/agenda', data),
   close: (data: { agendaId: number }) =>
-    api.put(`/agenda/close/${data.agendaId}`),
+    api.post(`/agenda/close/${data.agendaId}`),
   findById: (data: { agendaId: number }) => api.get(`/agenda/${data.agendaId}`),
   delete: (data: { agendaId: number }) =>
     api.delete(`/agenda/${data.agendaId}`),

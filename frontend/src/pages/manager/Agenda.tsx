@@ -18,7 +18,8 @@ type AttendanceVote = {
 };
 
 const Agenda = () => {
-  const { state, totalCount, attendCount } = useManagerRealtime();
+  const { state, totalCount, attendCount, currentAgendaId } =
+    useManagerRealtime();
 
   useEffect(() => {
     document.body.className = 'pc_white';
@@ -206,10 +207,46 @@ const Agenda = () => {
   };
 
   const closeAgenda = async () => {
+    const targetAgendaId = agendaId || currentAgendaId;
+    if (!targetAgendaId) {
+      console.error('종료할 의결 안건이 없습니다.');
+      return;
+    }
+
     try {
-      await useAgendaApi.close({ agendaId });
+      await useAgendaApi.close({ agendaId: targetAgendaId });
+      setAgendaId(targetAgendaId);
     } catch (e) {
-      console.error('의결 종료 실패', e);
+      console.error('의결 종료 API 실패, 상태 변경으로 종료를 진행합니다.', e);
+
+      try {
+        const res = await useAttendanceApi.findByAgendaId({
+          agendaId: targetAgendaId,
+        });
+
+        await Promise.all(
+          res.data
+            .filter((attendance: AttendanceVote) => attendance.voteValue === null)
+            .map((attendance: AttendanceVote) =>
+              useVoteApi
+                .make({
+                  attendanceId: attendance.attendanceId,
+                  voteValue: 'ABSTAIN',
+                })
+                .catch(() => undefined),
+            ),
+        );
+
+        await useStateApi.change({
+          currentState: 'RESULT',
+          currentAgendaId: targetAgendaId,
+        });
+        setAgendaId(targetAgendaId);
+        await fetchVoteResult(targetAgendaId);
+        await fetchAttendanceList(targetAgendaId);
+      } catch (fallbackError) {
+        console.error('의결 종료 실패', fallbackError);
+      }
     }
   };
   useEffect(() => {
