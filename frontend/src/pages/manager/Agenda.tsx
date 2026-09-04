@@ -236,8 +236,6 @@ const Agenda = () => {
         currentAgendaId: targetAgendaId,
       });
 
-      useAgendaApi.close({ agendaId: targetAgendaId }).catch(() => undefined);
-
       setAgendaId(targetAgendaId);
       await fetchVoteResult(targetAgendaId);
       await fetchAttendanceList(targetAgendaId);
