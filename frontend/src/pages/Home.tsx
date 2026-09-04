@@ -24,6 +24,7 @@ const Home = () => {
   const [userName, setUserName] = useState('');
   const [userDept, setUserDept] = useState('');
   const [userId, setUserId] = useState(0);
+  const [attendanceId, setAttendanceId] = useState(0);
 
   useEffect(() => {
     {
@@ -51,6 +52,7 @@ const Home = () => {
           agendaId: currentAgendaId,
           userId: userId,
         });
+        setAttendanceId(res.data.attendanceId);
         setOpinion(res.data.voteValue ?? null);
       } catch (e) {
         console.error(e);
@@ -60,6 +62,7 @@ const Home = () => {
   }, [currentAgendaId, userId]);
 
   useEffect(() => {
+    setAttendanceId(0);
     setOpinion(null);
   }, [currentAgendaId]);
 
@@ -98,7 +101,19 @@ const Home = () => {
     setIsSubmittingVote(true);
 
     try {
-      await useVoteApi.cast({ voteValue });
+      try {
+        await useVoteApi.cast({ voteValue });
+      } catch (castError) {
+        if (!attendanceId) {
+          throw castError;
+        }
+
+        try {
+          await useVoteApi.make({ attendanceId, voteValue });
+        } catch {
+          await useVoteApi.change({ attendanceId, voteValue });
+        }
+      }
     } catch (e) {
       setOpinion(previousOpinion);
       console.error(e);
@@ -182,7 +197,7 @@ const Home = () => {
               onClick={() => {
                 handleVote('AGREE');
               }}
-              disabled={isSubmittingVote}
+              disabled={isSubmittingVote || !attendanceId}
               className={`w-96 h-28  rounded-lg justify-center items-center ${opinion === 'AGREE' || opinion === null ? 'bg-[#57AA5A]' : 'bg-[#8E8E8E]'}`}
             >
               <p className="text-white text-4xl font-semibold">찬성</p>
@@ -191,7 +206,7 @@ const Home = () => {
               onClick={() => {
                 handleVote('DISAGREE');
               }}
-              disabled={isSubmittingVote}
+              disabled={isSubmittingVote || !attendanceId}
               className={`w-96 h-28  rounded-lg justify-center items-center ${opinion === 'DISAGREE' || opinion === null ? 'bg-[#F74040]' : 'bg-[#8E8E8E]'}`}
             >
               <p className="text-white text-4xl font-semibold">반대</p>
@@ -200,7 +215,7 @@ const Home = () => {
               onClick={() => {
                 handleVote('ABSTAIN');
               }}
-              disabled={isSubmittingVote}
+              disabled={isSubmittingVote || !attendanceId}
               className={`w-96 h-28  rounded-lg justify-center items-center ${opinion === 'ABSTAIN' || opinion === null ? 'bg-[#FBA650]' : 'bg-[#8E8E8E]'}`}
             >
               <p className="text-white text-4xl font-semibold">기권</p>
