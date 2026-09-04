@@ -29,7 +29,6 @@ const AgendaList = () => {
         const sortedData = [...res.data].sort(
           (a, b) => b.agendaId - a.agendaId,
         );
-        console.log(sortedData);
         setAgendaList(sortedData);
       } catch (error) {
         console.error('의결 항목 리스트를 불러오는 중 오류 발생:', error);
