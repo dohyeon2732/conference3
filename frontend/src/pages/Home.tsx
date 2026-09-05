@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MobileTopBar from '../components/MobileTopBar';
 import { useUserApi } from '../hooks/useUserApi';
 import { useUserRealtime } from '../contexts/UserRealtimeContext';
@@ -32,6 +32,11 @@ const Home = () => {
   const [userDept, setUserDept] = useState('');
   const [userId, setUserId] = useState(0);
   const [attendanceId, setAttendanceId] = useState(0);
+  const voteRequestLockRef = useRef(false);
+  const lastVoteClickRef = useRef<{
+    voteValue: SelectedVoteValue;
+    clickedAt: number;
+  } | null>(null);
 
   useEffect(() => {
     {
@@ -101,11 +106,24 @@ const Home = () => {
   }, [userId]);
 
   const handleVote = async (voteValue: SelectedVoteValue) => {
-    if (state !== 'VOTING' || isSubmittingVote) return;
+    const now = Date.now();
+    const lastVoteClick = lastVoteClickRef.current;
+
+    if (
+      lastVoteClick?.voteValue === voteValue &&
+      now - lastVoteClick.clickedAt < 350
+    ) {
+      return;
+    }
+
+    lastVoteClickRef.current = { voteValue, clickedAt: now };
+
+    if (state !== 'VOTING' || voteRequestLockRef.current) return;
 
     const previousOpinion = opinion;
     const nextOpinion = previousOpinion === voteValue ? null : voteValue;
 
+    voteRequestLockRef.current = true;
     setOpinion(nextOpinion);
     setIsSubmittingVote(true);
 
@@ -130,6 +148,7 @@ const Home = () => {
       setOpinion(previousOpinion);
       console.error(e);
     } finally {
+      voteRequestLockRef.current = false;
       setIsSubmittingVote(false);
     }
   };
