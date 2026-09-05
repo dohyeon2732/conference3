@@ -118,7 +118,7 @@ const Home = () => {
   };
 
   return (
-    <div className="w-[393px] flex flex-col items-center justify-center">
+    <div className="w-full max-w-[393px] min-h-[100dvh] mx-auto flex flex-col items-center overflow-hidden">
       <MobileTopBar
         buttonOn={true}
         dept={userDept}
@@ -128,23 +128,23 @@ const Home = () => {
       />
 
       {/* 상태 창 */}
-      <div className="fixed top-[92px] w-[353px] flex flex-row gap-3 justify-end items-center ">
+      <div className="fixed top-[92px] w-[calc(100%-40px)] max-w-[353px] flex flex-row gap-3 justify-end items-center">
         <div className="flex flex-row gap-2 justify-center items-center text-center">
           <div
-            className={`w-6 h-6 rounded-full ${state === 'PROGRESS' ? 'bg-[#57AA5A]' : state === 'STOP' ? 'bg-[#F74040]' : 'bg-[#FBA650]'}`}
+            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full ${state === 'PROGRESS' ? 'bg-[#57AA5A]' : state === 'STOP' ? 'bg-[#F74040]' : 'bg-[#FBA650]'}`}
           ></div>
           <p
-            className={`text-xl, font-bold ${state === 'PROGRESS' ? 'text-[#57AA5A]' : state === 'STOP' ? 'text-[#F74040]' : 'text-[#FBA650]'}`}
+            className={`text-lg sm:text-xl font-bold ${state === 'PROGRESS' ? 'text-[#57AA5A]' : state === 'STOP' ? 'text-[#F74040]' : 'text-[#FBA650]'}`}
           >
             {state === 'PROGRESS' ? '개의' : state === 'STOP' ? '정회' : '의결'}
           </p>
         </div>
         <div className="flex flex-row gap-2 ">
           <div
-            className={`w-6 h-6 rounded-full ${myAttendance ? 'bg-[#57AA5A]' : 'bg-[#F74040]'}`}
+            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full ${myAttendance ? 'bg-[#57AA5A]' : 'bg-[#F74040]'}`}
           ></div>
           <p
-            className={`text-xl, font-bold ${myAttendance ? 'text-[#57AA5A]' : 'text-[#F74040]'}`}
+            className={`text-lg sm:text-xl font-bold ${myAttendance ? 'text-[#57AA5A]' : 'text-[#F74040]'}`}
           >
             {myAttendance ? '참석' : '불참'}
           </p>
@@ -153,7 +153,7 @@ const Home = () => {
 
       {/* 의결 중 */}
       {bidae && (
-        <div className="flex flex-col justify-center items-center pt-50 w-[353px] gap-5 text-center">
+        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center pt-[132px] pb-8">
           <p className="flex justify-center items-center text-neutral-400 text-2xl font-semibold">
             비대위 단위는 의결권이 없습니다.
           </p>
@@ -162,7 +162,7 @@ const Home = () => {
 
       {/* 불참 */}
       {!bidae && !myAttendance && (
-        <div className="flex flex-col justify-center items-center pt-50 w-[353px] gap-5 text-center">
+        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center pt-[132px] pb-8">
           <p className="flex justify-center items-center text-neutral-400 text-xl font-semibold">
             회의 불참 상태입니다. <br /> 회의에 참석한 후 의결에 참여해주세요.
           </p>
@@ -171,7 +171,7 @@ const Home = () => {
 
       {/* 의결 준비중 */}
       {!bidae && state === 'PROGRESS' && myAttendance && (
-        <div className="flex flex-col justify-center items-center pt-50 w-[353px] gap-5 text-center">
+        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center pt-[132px] pb-8">
           <p className="flex justify-center items-center text-neutral-400 text-2xl font-semibold">
             {' '}
             의결 준비 중
@@ -181,47 +181,55 @@ const Home = () => {
 
       {/* 의결 중 */}
       {!bidae && state === 'VOTING' && myAttendance && (
-        <div className="flex flex-col justify-center items-center w-[353px] gap-5">
+        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-4 pt-[132px] pb-4">
           <div className="flex flex-col gap-2 justify-center items-center text-center">
-            <p className="text-2xl font-semibold">의결</p>
-            <p className="text-xl font-semibold">{agendaName}</p>
+            <p className="text-xl sm:text-2xl font-semibold">의결</p>
+            <p className="text-lg sm:text-xl font-semibold leading-tight break-keep">
+              {agendaName}
+            </p>
           </div>
 
-          <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-4 sm:gap-6 w-full">
             <button
               onClick={() => {
                 handleVote('AGREE');
               }}
               disabled={isSubmittingVote || !attendanceId}
-              className={`w-96 h-28  rounded-lg justify-center items-center ${opinion === 'AGREE' || opinion === null ? 'bg-[#57AA5A]' : 'bg-[#8E8E8E]'}`}
+              className={`w-full h-[clamp(76px,14dvh,112px)] rounded-lg flex justify-center items-center disabled:cursor-default ${opinion === 'AGREE' || opinion === null ? 'bg-[#57AA5A]' : 'bg-[#8E8E8E]'}`}
             >
-              <p className="text-white text-4xl font-semibold">찬성</p>
+              <p className="text-white text-3xl sm:text-4xl font-semibold">
+                찬성
+              </p>
             </button>
             <button
               onClick={() => {
                 handleVote('DISAGREE');
               }}
               disabled={isSubmittingVote || !attendanceId}
-              className={`w-96 h-28  rounded-lg justify-center items-center ${opinion === 'DISAGREE' || opinion === null ? 'bg-[#F74040]' : 'bg-[#8E8E8E]'}`}
+              className={`w-full h-[clamp(76px,14dvh,112px)] rounded-lg flex justify-center items-center disabled:cursor-default ${opinion === 'DISAGREE' || opinion === null ? 'bg-[#F74040]' : 'bg-[#8E8E8E]'}`}
             >
-              <p className="text-white text-4xl font-semibold">반대</p>
+              <p className="text-white text-3xl sm:text-4xl font-semibold">
+                반대
+              </p>
             </button>
-            <button
+            {/* <button
               onClick={() => {
                 handleVote('ABSTAIN');
               }}
               disabled={isSubmittingVote || !attendanceId}
-              className={`w-96 h-28  rounded-lg justify-center items-center ${opinion === 'ABSTAIN' || opinion === null ? 'bg-[#FBA650]' : 'bg-[#8E8E8E]'}`}
+              className={`w-full h-[clamp(76px,14dvh,112px)] rounded-lg flex justify-center items-center disabled:cursor-default ${opinion === 'ABSTAIN' || opinion === null ? 'bg-[#FBA650]' : 'bg-[#8E8E8E]'}`}
             >
-              <p className="text-white text-4xl font-semibold">기권</p>
-            </button>
+              <p className="text-white text-3xl sm:text-4xl font-semibold">
+                기권
+              </p>
+            </button> */}
           </div>
         </div>
       )}
 
       {/* 정회 */}
       {!bidae && state === 'STOP' && myAttendance && (
-        <div className="flex flex-col justify-center items-center pt-50 w-[353px] gap-5">
+        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 pt-[132px] pb-8">
           <p className="flex justify-center items-center text-neutral-400 text-2xl font-semibold">
             정회 중입니다.
           </p>
