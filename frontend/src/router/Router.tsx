@@ -34,7 +34,7 @@ const ManagerAuthGuard = ({ children }: { children: ReactNode }) => {
   if (!token || getTokenRole(token) !== 'ADMIN') {
     alert('관리자 로그인이 필요합니다.');
     localStorage.removeItem('accessToken');
-    return <Navigate to="/manager/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;
