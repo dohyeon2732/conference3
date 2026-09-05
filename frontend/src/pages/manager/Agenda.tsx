@@ -320,6 +320,7 @@ const Agenda = () => {
             className="absolute left-24 top-3"
           />
           <input
+            disabled={state === 'VOTING' || state === 'RESULT'}
             className="w-[calc(100vw-1002px)]  h-12 p-3 pl-12 bg-zinc-100 rounded-lg text-2xl font-bold "
             type="text"
             placeholder="안건 명을 입력하세요"
