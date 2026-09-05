@@ -224,7 +224,8 @@ const Home = () => {
         <div className="flex flex-1 min-h-0 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center">
           <p className="flex justify-center items-center text-neutral-400 text-2xl font-semibold">
             {' '}
-            의결이 종료되었습니다. 전면의 결과를 확인해주세요.
+            의결이 종료되었습니다. <br />
+            전면의 결과를 확인해주세요.
           </p>
         </div>
       )}
