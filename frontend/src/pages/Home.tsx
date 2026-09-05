@@ -204,7 +204,7 @@ const Home = () => {
       {/* 불참 */}
       {!bidae && !myAttendance && (
         <div className="flex flex-1 min-h-0 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center">
-          <p className="flex justify-center items-center text-neutral-400 text-xl font-semibold">
+          <p className="text-neutral-400 text-xl font-semibold">
             회의 불참 상태입니다. <br /> 회의에 참석한 후 의결에 참여해주세요.
           </p>
         </div>
@@ -222,9 +222,9 @@ const Home = () => {
 
       {!bidae && state === 'RESULT' && myAttendance && (
         <div className="flex flex-1 min-h-0 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center">
-          <p className="flex justify-center items-center text-neutral-400 text-2xl font-semibold">
-            {' '}
-            의결이 종료되었습니다. <br />
+          <p className="text-neutral-400 text-2xl font-semibold leading-relaxed">
+            의결이 종료되었습니다.
+            <br />
             전면의 결과를 확인해주세요.
           </p>
         </div>
