@@ -1,4 +1,9 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from 'react-router-dom';
+import type { ReactNode } from 'react';
 import Login from '../pages/Login';
 import Password from '../pages/Password';
 import Home from '../pages/Home';
@@ -14,13 +19,27 @@ import { UserRealtimeProvider } from '../contexts/UserRealtimeContext';
 import Setting from '../pages/manager/Setting';
 import { ManagerRealtimeProvider } from '../contexts/ManagerRealtimeContext';
 
-// const AuthGuard = ({ children }: { children: JSX.Element }) => {
-//   const token = localStorage.getItem("accessToken");
-//   if (!token) {
-//     return <Navigate to="/" replace />;
-//   }
-//   return children;
-// };
+const getTokenRole = (token: string) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.role;
+  } catch {
+    return null;
+  }
+};
+
+const ManagerAuthGuard = ({ children }: { children: ReactNode }) => {
+  const token = localStorage.getItem('accessToken');
+
+  if (!token || getTokenRole(token) !== 'ADMIN') {
+    alert('관리자 로그인이 필요합니다.');
+    localStorage.removeItem('accessToken');
+    return <Navigate to="/manager/login" replace />;
+  }
+
+  return children;
+};
+
 const router = createBrowserRouter([
   { path: '/', element: <Login /> },
   { path: '/attendance', element: <PublicAttend /> },
@@ -28,9 +47,11 @@ const router = createBrowserRouter([
   {
     path: '/manager/result',
     element: (
-      <ManagerRealtimeProvider>
-        <Result />
-      </ManagerRealtimeProvider>
+      <ManagerAuthGuard>
+        <ManagerRealtimeProvider>
+          <Result />
+        </ManagerRealtimeProvider>
+      </ManagerAuthGuard>
     ),
   },
 
@@ -46,7 +67,11 @@ const router = createBrowserRouter([
 
   {
     path: '/manager',
-    element: <ManagerLayout />,
+    element: (
+      <ManagerAuthGuard>
+        <ManagerLayout />
+      </ManagerAuthGuard>
+    ),
     children: [
       { path: 'attend', element: <Attend /> },
       { path: 'agendalist', element: <AgendaList /> },

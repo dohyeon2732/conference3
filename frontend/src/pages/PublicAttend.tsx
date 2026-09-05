@@ -103,6 +103,10 @@ const PublicAttend = () => {
   return (
     <div className="flex flex-col w-screen min-h-screen bg-white">
       <div className="fixed left-0 top-0 flex flex-col pt-10 pl-16 pb-5 w-full gap-6 bg-white shadow-[0px_4px_4px_0px_rgba(0,0,0,0.05)] z-10">
+        <div className="font-bold text-3xl">
+          2026학년도 하반기 전체학생대표자회의 출석 대의원 명부
+        </div>
+
         <div className="flex flex-row gap-4.5">
           <div
             className={`w-[30px] h-[30px] rounded-full ${state === 'PROGRESS' ? 'bg-[#57AA5A]' : state === 'STOP' ? 'bg-[#F74040]' : 'bg-[#FBA650]'}`}
@@ -166,7 +170,7 @@ const PublicAttend = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 mt-[244px] mx-12">
+      <div className="flex flex-col gap-4 mt-[288px] mx-12">
         {deptList.map((dept) => (
           <div className="flex flex-row gap-3 items-center" key={dept.deptId}>
             <p className="w-40 text-2xl font-bold text-center">
