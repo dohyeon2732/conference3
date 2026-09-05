@@ -131,7 +131,9 @@ const Home = () => {
     if (state !== 'VOTING' || voteRequestLockRef.current) return;
 
     const previousOpinion = opinion;
-    const nextOpinion = previousOpinion === voteValue ? null : voteValue;
+    if (previousOpinion === voteValue) return;
+
+    const nextOpinion = voteValue;
 
     voteRequestLockRef.current = true;
     voteTouchedRef.current = true;
@@ -139,21 +141,13 @@ const Home = () => {
     setIsSubmittingVote(true);
 
     try {
-      if (nextOpinion === null) {
-        try {
-          await useVoteApi.cancelCast();
-        } catch (cancelError) {
-          throw cancelError;
+      try {
+        await useVoteApi.cast({ voteValue: nextOpinion });
+      } catch (castError) {
+        if (!attendanceId) {
+          throw castError;
         }
-      } else {
-        try {
-          await useVoteApi.cast({ voteValue: nextOpinion });
-        } catch (castError) {
-          if (!attendanceId) {
-            throw castError;
-          }
-          await useVoteApi.make({ attendanceId, voteValue: nextOpinion });
-        }
+        await useVoteApi.make({ attendanceId, voteValue: nextOpinion });
       }
     } catch (e) {
       setOpinion(previousOpinion);
