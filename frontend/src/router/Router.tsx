@@ -8,6 +8,7 @@ import AgendaList from '../pages/manager/AgendaList';
 import Member from '../pages/manager/Member';
 import Agenda from '../pages/manager/Agenda';
 import LoginManager from '../pages/LoginManager';
+import PublicAttend from '../pages/PublicAttend';
 import ManagerLayout from '../layouts/ManagerLayout';
 import { UserRealtimeProvider } from '../contexts/UserRealtimeContext';
 import Setting from '../pages/manager/Setting';
@@ -22,6 +23,7 @@ import { ManagerRealtimeProvider } from '../contexts/ManagerRealtimeContext';
 // };
 const router = createBrowserRouter([
   { path: '/', element: <Login /> },
+  { path: '/attendance', element: <PublicAttend /> },
   { path: '/manager/login', element: <LoginManager /> },
   {
     path: '/manager/result',
