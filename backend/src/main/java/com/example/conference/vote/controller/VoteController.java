@@ -33,6 +33,12 @@ public class VoteController {
         return voteService.cast(userId, dto);
     }
 
+    @DeleteMapping("/cast")
+    public void cancelCast(HttpServletRequest request){
+        Long userId = (Long) request.getAttribute("userId");
+        voteService.cancelCast(userId);
+    }
+
     @GetMapping("/result/{agendaId}")
     public AgendaVoteResultResponse getAgendaVoteResult(@PathVariable Long agendaId) {
         return voteService.getAgendaVoteResult(agendaId);

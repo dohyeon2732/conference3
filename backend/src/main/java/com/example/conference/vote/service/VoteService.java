@@ -102,6 +102,26 @@ public class VoteService {
                 .build();
     }
 
+    public void cancelCast(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("Unauthorized");
+        }
+
+        var state = stateRepository.findByStateId(CURRENT_STATE_ID)
+                .orElseThrow(() -> new IllegalStateException("conference state not found"));
+
+        if (state.getCurrentState() != ConferenceState.VOTING || state.getCurrentAgendaId() == null) {
+            throw new IllegalStateException("Voting is not in progress");
+        }
+
+        var attendance = attendanceRepository
+                .findByUserIdAndAgendaIdForUpdate(userId, state.getCurrentAgendaId())
+                .orElseThrow(() -> new IllegalArgumentException("No voting right for current agenda"));
+
+        voteRepository.findByAttendanceAttendanceId(attendance.getAttendanceId())
+                .ifPresent(voteRepository::delete);
+    }
+
     public AgendaVoteResultResponse getAgendaVoteResult(Long agendaId) {
         Integer agreeCount = voteRepository.countByAttendance_Agenda_AgendaIdAndVoteValue(
                 agendaId,

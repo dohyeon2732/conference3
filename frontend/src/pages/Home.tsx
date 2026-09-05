@@ -14,6 +14,13 @@ const Home = () => {
 
   useEffect(() => {
     document.body.className = 'mobile';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
   }, []);
 
   const [bidae, setBidae] = useState(false);
@@ -97,17 +104,27 @@ const Home = () => {
     if (state !== 'VOTING' || isSubmittingVote) return;
 
     const previousOpinion = opinion;
-    setOpinion(voteValue);
+    const nextOpinion = previousOpinion === voteValue ? null : voteValue;
+
+    setOpinion(nextOpinion);
     setIsSubmittingVote(true);
 
     try {
-      try {
-        await useVoteApi.cast({ voteValue });
-      } catch (castError) {
-        if (!attendanceId) {
-          throw castError;
+      if (nextOpinion === null) {
+        try {
+          await useVoteApi.cancelCast();
+        } catch (cancelError) {
+          throw cancelError;
         }
-        await useVoteApi.make({ attendanceId, voteValue });
+      } else {
+        try {
+          await useVoteApi.cast({ voteValue: nextOpinion });
+        } catch (castError) {
+          if (!attendanceId) {
+            throw castError;
+          }
+          await useVoteApi.make({ attendanceId, voteValue: nextOpinion });
+        }
       }
     } catch (e) {
       setOpinion(previousOpinion);
@@ -118,7 +135,7 @@ const Home = () => {
   };
 
   return (
-    <div className="w-full max-w-[393px] min-h-[100dvh] mx-auto flex flex-col items-center overflow-hidden">
+    <div className="w-full max-w-[393px] h-[100dvh] mx-auto flex flex-col items-center overflow-hidden pt-[128px] pb-3">
       <MobileTopBar
         buttonOn={true}
         dept={userDept}
@@ -153,7 +170,7 @@ const Home = () => {
 
       {/* 의결 중 */}
       {bidae && (
-        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center pt-[132px] pb-8">
+        <div className="flex flex-1 min-h-0 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center">
           <p className="flex justify-center items-center text-neutral-400 text-2xl font-semibold">
             비대위 단위는 의결권이 없습니다.
           </p>
@@ -162,7 +179,7 @@ const Home = () => {
 
       {/* 불참 */}
       {!bidae && !myAttendance && (
-        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center pt-[132px] pb-8">
+        <div className="flex flex-1 min-h-0 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center">
           <p className="flex justify-center items-center text-neutral-400 text-xl font-semibold">
             회의 불참 상태입니다. <br /> 회의에 참석한 후 의결에 참여해주세요.
           </p>
@@ -171,7 +188,7 @@ const Home = () => {
 
       {/* 의결 준비중 */}
       {!bidae && state === 'PROGRESS' && myAttendance && (
-        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center pt-[132px] pb-8">
+        <div className="flex flex-1 min-h-0 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 text-center">
           <p className="flex justify-center items-center text-neutral-400 text-2xl font-semibold">
             {' '}
             의결 준비 중
@@ -181,7 +198,7 @@ const Home = () => {
 
       {/* 의결 중 */}
       {!bidae && state === 'VOTING' && myAttendance && (
-        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-4 pt-[132px] pb-4">
+        <div className="flex flex-1 min-h-0 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-4">
           <div className="flex flex-col gap-2 justify-center items-center text-center">
             <p className="text-xl sm:text-2xl font-semibold">의결</p>
             <p className="text-lg sm:text-xl font-semibold leading-tight break-keep">
@@ -229,7 +246,7 @@ const Home = () => {
 
       {/* 정회 */}
       {!bidae && state === 'STOP' && myAttendance && (
-        <div className="flex flex-1 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5 pt-[132px] pb-8">
+        <div className="flex flex-1 min-h-0 flex-col justify-center items-center w-[calc(100%-40px)] max-w-[353px] gap-5">
           <p className="flex justify-center items-center text-neutral-400 text-2xl font-semibold">
             정회 중입니다.
           </p>
