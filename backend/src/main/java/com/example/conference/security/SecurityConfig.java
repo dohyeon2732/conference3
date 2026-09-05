@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/state/stream","/user/count/stream","/user/attendance/stream","/agenda/*","/vote/result/**","/attendance/agenda/*/user/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/vote", "/vote/cast").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/vote").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/vote/cast").authenticated()
                         .requestMatchers("/state/**","/vote/**","/agenda/**","/attendance/**","/user/**","/dept/**","/manager/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated())
