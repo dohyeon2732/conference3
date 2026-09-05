@@ -37,6 +37,7 @@ const Home = () => {
     voteValue: SelectedVoteValue;
     clickedAt: number;
   } | null>(null);
+  const voteTouchedRef = useRef(false);
 
   useEffect(() => {
     {
@@ -60,12 +61,19 @@ const Home = () => {
         return;
 
       try {
+        const requestedAt = Date.now();
         const res = await useAttendanceApi.findByAgendaIdUserId({
           agendaId: currentAgendaId,
           userId: userId,
         });
         setAttendanceId(res.data.attendanceId);
-        setOpinion(res.data.voteValue ?? null);
+        const lastVoteClick = lastVoteClickRef.current;
+        const hasNewerVoteClick =
+          lastVoteClick !== null && lastVoteClick.clickedAt > requestedAt;
+
+        if (!voteTouchedRef.current && !hasNewerVoteClick) {
+          setOpinion(res.data.voteValue ?? null);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -76,6 +84,8 @@ const Home = () => {
   useEffect(() => {
     setAttendanceId(0);
     setOpinion(null);
+    voteTouchedRef.current = false;
+    lastVoteClickRef.current = null;
   }, [currentAgendaId]);
 
   useEffect(() => {
@@ -124,6 +134,7 @@ const Home = () => {
     const nextOpinion = previousOpinion === voteValue ? null : voteValue;
 
     voteRequestLockRef.current = true;
+    voteTouchedRef.current = true;
     setOpinion(nextOpinion);
     setIsSubmittingVote(true);
 
