@@ -170,7 +170,7 @@ const PublicAttend = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 mt-[288px] mx-12">
+      <div className="flex flex-col gap-4 mt-[300px] mx-12">
         {deptList.map((dept) => (
           <div className="flex flex-row gap-3 items-center" key={dept.deptId}>
             <p className="w-40 text-2xl font-bold text-center">
