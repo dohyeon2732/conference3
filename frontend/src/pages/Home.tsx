@@ -207,7 +207,7 @@ const Home = () => {
             {state === 'PROGRESS' ? '개의' : state === 'STOP' ? '정회' : '의결'}
           </p>
         </div>
-        <div className="flex flex-row gap-2 ">
+        <div className="flex flex-row gap-2 justify-center items-center text-center">
           <div
             className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full ${myAttendance ? 'bg-[#57AA5A]' : 'bg-[#F74040]'}`}
           ></div>
