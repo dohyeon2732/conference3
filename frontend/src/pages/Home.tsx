@@ -158,6 +158,33 @@ const Home = () => {
     }
   };
 
+  const handleCancelVote = async () => {
+    if (
+      state !== 'VOTING' ||
+      voteRequestLockRef.current ||
+      opinion === null ||
+      !attendanceId
+    )
+      return;
+
+    const previousOpinion = opinion;
+
+    voteRequestLockRef.current = true;
+    voteTouchedRef.current = true;
+    setOpinion(null);
+    setIsSubmittingVote(true);
+
+    try {
+      await useVoteApi.cancelCast();
+    } catch (e) {
+      setOpinion(previousOpinion);
+      console.error(e);
+    } finally {
+      voteRequestLockRef.current = false;
+      setIsSubmittingVote(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-[393px] h-[100dvh] mx-auto flex flex-col items-center overflow-hidden pt-[128px] pb-3">
       <MobileTopBar
@@ -274,6 +301,17 @@ const Home = () => {
                 기권
               </p>
             </button> */}
+            {opinion !== null && (
+              <button
+                onClick={handleCancelVote}
+                disabled={isSubmittingVote || !attendanceId}
+                className="w-full h-[clamp(52px,9dvh,72px)] rounded-lg border-2 border-[#8E8E8E] bg-white flex justify-center items-center disabled:cursor-default disabled:opacity-60"
+              >
+                <p className="text-[#4A4A4A] text-2xl sm:text-3xl font-semibold">
+                  투표 취소
+                </p>
+              </button>
+            )}
           </div>
         </div>
       )}
