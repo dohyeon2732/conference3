@@ -12,7 +12,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final long EXPIRATION = 1000 * 60 * 60; // 1시간
+    private final long EXPIRATION = 1000 * 60 * 60 * 24 * 2; // 2일
 
     private static final String SECRET_KEY =
             "momentum-secret-key-momentum-secret-key";
