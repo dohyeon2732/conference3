@@ -77,7 +77,7 @@ public class UserService {
     }
 
     public AdminLoginResponseDTO adminLogin(AdminLoginRequestDTO dto) {
-        if (!"chdgkrtodghl".equals(dto.getPassword()) && !"총학생회".equals(dto.getPassword())) {
+        if (!"chdgkrtodghl!".equals(dto.getPassword()) && !"총학생회!".equals(dto.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
 
