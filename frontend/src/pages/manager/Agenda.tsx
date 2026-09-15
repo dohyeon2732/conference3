@@ -45,50 +45,6 @@ const Agenda = () => {
     }[]
   >([]);
 
-  useEffect(() => {
-    const eventSource = useUserApi.attendStream(
-      (data) => {
-        setUserList((prev) =>
-          prev.map((user) =>
-            user.userId === data.userId
-              ? { ...user, attend: data.attend }
-              : user,
-          ),
-        );
-      },
-      (error) => {
-        console.error('출석 상태 SSE 연결 오류', error);
-      },
-    );
-
-    return () => {
-      eventSource.close();
-    };
-  }, []);
-
-  useEffect(() => {
-    const fetchUserList = async () => {
-      try {
-        const res = await useUserApi.findAll();
-        setUserList(res.data);
-      } catch (e) {
-        console.error('사용자 목록 조회 실패', e);
-      }
-    };
-
-    const fetchDeptList = async () => {
-      try {
-        const res = await useDeptApi.findAll();
-        setDeptList(res.data);
-      } catch (e) {
-        console.error('소속 목록 조회', e);
-      }
-    };
-
-    fetchUserList();
-    fetchDeptList();
-  }, []);
-
   const [agendaName, setAgendaName] = useState('');
   const [countOption, setCountOption] = useState(0); //0: 일반(1/2), 1: 특별(2/3)
   const [agendaId, setAgendaId] = useState(0);
@@ -100,6 +56,24 @@ const Agenda = () => {
   });
 
   const [attendanceList, setAttendanceList] = useState<AttendanceVote[]>([]);
+
+  const fetchUserList = async () => {
+    try {
+      const res = await useUserApi.findAll();
+      setUserList(res.data);
+    } catch (e) {
+      console.error('사용자 목록 조회 실패', e);
+    }
+  };
+
+  const fetchDeptList = async () => {
+    try {
+      const res = await useDeptApi.findAll();
+      setDeptList(res.data);
+    } catch (e) {
+      console.error('소속 목록 조회', e);
+    }
+  };
 
   const isQuorumMet = attendCount >= Math.ceil(totalCount / 2);
 
@@ -158,6 +132,48 @@ const Agenda = () => {
     }
   };
 
+  const syncAttendanceList = async (targetAgendaId: number) => {
+    await useAttendanceApi.create({
+      agendaId: targetAgendaId,
+    });
+    await fetchAttendanceList(targetAgendaId);
+  };
+
+  useEffect(() => {
+    const eventSource = useUserApi.attendStream(
+      async (data) => {
+        setUserList((prev) =>
+          prev.map((user) =>
+            user.userId === data.userId
+              ? { ...user, attend: data.attend }
+              : user,
+          ),
+        );
+
+        const targetAgendaId = agendaId || currentAgendaId;
+        if (state !== 'VOTING' || !data.attend || !targetAgendaId) return;
+
+        try {
+          await syncAttendanceList(targetAgendaId);
+        } catch (e) {
+          console.error('의결 명부 동기화 실패', e);
+        }
+      },
+      (error) => {
+        console.error('출석 상태 SSE 연결 오류', error);
+      },
+    );
+
+    return () => {
+      eventSource.close();
+    };
+  }, [agendaId, currentAgendaId, state]);
+
+  useEffect(() => {
+    fetchUserList();
+    fetchDeptList();
+  }, []);
+
   const createAgenda = async () => {
     if (agendaName.trim() === '') {
       alert('의결 명을 입력해주세요.');
@@ -174,6 +190,7 @@ const Agenda = () => {
       await useAttendanceApi.create({
         agendaId: res.data.agendaId,
       });
+      await Promise.all([fetchUserList(), fetchDeptList()]);
       await useStateApi.change({
         currentState: 'VOTING',
         currentAgendaId: res.data.agendaId,
@@ -212,6 +229,8 @@ const Agenda = () => {
     }
 
     try {
+      await syncAttendanceList(targetAgendaId);
+
       const res = await useAttendanceApi.findByAgendaId({
         agendaId: targetAgendaId,
       });
@@ -245,7 +264,7 @@ const Agenda = () => {
     if (state !== 'VOTING' || !agendaId) return;
 
     fetchVoteResult(agendaId);
-    fetchAttendanceList(agendaId);
+    syncAttendanceList(agendaId);
 
     const interval = setInterval(() => {
       fetchVoteResult(agendaId);
@@ -254,6 +273,28 @@ const Agenda = () => {
 
     return () => clearInterval(interval);
   }, [state, agendaId]);
+
+  useEffect(() => {
+    const targetAgendaId = agendaId || currentAgendaId;
+    if (state !== 'VOTING' || !targetAgendaId) return;
+
+    const refreshRoster = async () => {
+      try {
+        await Promise.all([
+          fetchUserList(),
+          fetchDeptList(),
+          syncAttendanceList(targetAgendaId),
+        ]);
+      } catch (e) {
+        console.error('의결 명부 새로고침 실패', e);
+      }
+    };
+
+    refreshRoster();
+    const interval = setInterval(refreshRoster, 3000);
+
+    return () => clearInterval(interval);
+  }, [agendaId, currentAgendaId, state]);
 
   useEffect(() => {
     if (state !== 'VOTING') return;
@@ -276,8 +317,9 @@ const Agenda = () => {
       setAgendaId(currentAgenda.agendaId);
       setAgendaName(currentAgenda.agendaName);
 
+      await Promise.all([fetchUserList(), fetchDeptList()]);
       fetchVoteResult(currentAgenda.agendaId);
-      fetchAttendanceList(currentAgenda.agendaId);
+      syncAttendanceList(currentAgenda.agendaId);
     } catch (e) {
       console.error(e);
     }
