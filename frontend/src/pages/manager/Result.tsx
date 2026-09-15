@@ -14,7 +14,8 @@ const Result = () => {
     voteValue: 'AGREE' | 'DISAGREE' | 'ABSTAIN' | null;
   };
 
-  const { state, currentAgendaId } = useManagerRealtime();
+  const { state, currentAgendaId, latestAttendanceUpdate } =
+    useManagerRealtime();
   // 'PROGRESS': 준비중, 'VOTING': 의결, 'RESULT': 결과
 
   const [voteResult, setVoteResult] = useState<{
@@ -40,9 +41,10 @@ const Result = () => {
     }[]
   >([]);
 
-  const votingRightCount = userList.filter(
-    (user) => user.attend && !user.emergency,
-  ).length;
+  const votingRightCount =
+    state === 'RESULT'
+      ? attendanceList.length
+      : userList.filter((user) => user.attend && !user.emergency).length;
 
   const getVoteColor = (voteValue: AttendanceVote['voteValue']) => {
     if (voteValue === 'AGREE') return 'text-[#57AA5A]';
@@ -61,6 +63,33 @@ const Result = () => {
   useEffect(() => {
     document.body.className = 'pc_black';
   }, []);
+
+  const fetchUserList = async () => {
+    try {
+      const res = await useUserApi.findAll();
+      setUserList(res.data);
+    } catch (e) {
+      console.error('사용자 목록 조회 실패', e);
+    }
+  };
+
+  const fetchAttendanceList = async (agendaId: number) => {
+    try {
+      const res = await useAttendanceApi.findByAgendaId({ agendaId });
+      setAttendanceList(res.data);
+    } catch (e) {
+      console.error('출석부 조회 실패', e);
+    }
+  };
+
+  const syncAttendanceList = async (agendaId: number) => {
+    await useAttendanceApi.create({ agendaId });
+    await fetchAttendanceList(agendaId);
+  };
+
+  const refreshVotingRoster = async (agendaId: number) => {
+    await Promise.all([fetchUserList(), syncAttendanceList(agendaId)]);
+  };
 
   useEffect(() => {
     const fetchAgenda = async () => {
@@ -97,32 +126,9 @@ const Result = () => {
     fetchResult();
   }, [currentAgendaId]);
 
-  useEffect(() => {
-    const fetchUserList = async () => {
-      try {
-        const res = await useUserApi.findAll();
-        setUserList(res.data);
-      } catch (e) {
-        console.error('사용자 목록 조회 실패', e);
-      }
-    };
-
-    fetchUserList();
-  }, []);
-
-  const fetchAttendanceList = async (agendaId: number) => {
-    try {
-      const res = await useAttendanceApi.findByAgendaId({ agendaId });
-      setAttendanceList(res.data);
-      console.log('출석부 리스트', res.data);
-    } catch (e) {
-      console.error('출석부 조회 실패', e);
-    }
-  };
   const fetchVoteResult = async (agendaId: number) => {
     try {
       const res = await useVoteApi.result({ agendaId });
-      console.log('투표 결과', res.data);
       setVoteResult({
         agendaId: agendaId,
         agreeCount: res.data.agreeCount,
@@ -137,8 +143,14 @@ const Result = () => {
   };
 
   useEffect(() => {
+    fetchUserList();
+  }, []);
+
+  useEffect(() => {
     if (state === 'RESULT' && currentAgendaId !== null) {
       fetchVoteResult(currentAgendaId);
+      fetchUserList();
+      fetchAttendanceList(currentAgendaId);
     }
   }, [state, currentAgendaId]);
 
@@ -146,7 +158,7 @@ const Result = () => {
     if (state !== 'VOTING' || !currentAgendaId) return;
 
     fetchVoteResult(currentAgendaId);
-    fetchAttendanceList(currentAgendaId);
+    refreshVotingRoster(currentAgendaId);
 
     const interval = setInterval(() => {
       fetchVoteResult(currentAgendaId);
@@ -155,6 +167,24 @@ const Result = () => {
 
     return () => clearInterval(interval);
   }, [state, currentAgendaId]);
+
+  useEffect(() => {
+    if (state !== 'VOTING' || !currentAgendaId) return;
+
+    const interval = setInterval(() => {
+      refreshVotingRoster(currentAgendaId);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [state, currentAgendaId]);
+
+  useEffect(() => {
+    if (state !== 'VOTING' || !currentAgendaId || !latestAttendanceUpdate) {
+      return;
+    }
+
+    refreshVotingRoster(currentAgendaId);
+  }, [latestAttendanceUpdate, state, currentAgendaId]);
 
   return (
     <div
