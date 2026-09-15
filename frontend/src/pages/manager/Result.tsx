@@ -162,36 +162,36 @@ const Result = () => {
     >
       {state !== 'PROGRESS' && (
         <div className="flex flex-col w-screen px-20 pt-15 ">
-          <div className="flex flex-row justify-between items-center mb-10">
+          <div className="relative flex items-center justify-center mb-10 min-h-[150px]">
             <div
-              className={`flex flex-col gap-2 ${state === 'VOTING' ? '' : 'invisible'}`}
+              className={`absolute left-0 top-1/2 -translate-y-1/2 flex flex-col gap-2 ${state === 'VOTING' ? '' : 'invisible'}`}
             >
-              <div className="flex felx-row gap-4.5 items-center">
+              <div className="flex flex-row gap-4.5 items-center">
                 <div className="w-[30px] h-[30px]  bg-[#57AA5A] rounded-full"></div>
                 <p className="text-2xl font-semibold text-[#57AA5A]">
                   찬성 {voteResult?.agreeCount}
                 </p>
               </div>
-              <div className="flex felx-row gap-4.5 items-center">
+              <div className="flex flex-row gap-4.5 items-center">
                 <div className="w-[30px] h-[30px]  bg-[#F74040] rounded-full"></div>
                 <p className="text-2xl font-semibold text-[#F74040]">
                   반대 {voteResult?.disagreeCount}
                 </p>
               </div>
-              <div className="flex felx-row gap-4.5 items-center">
+              <div className="flex flex-row gap-4.5 items-center">
                 <div className="w-[30px] h-[30px]  bg-[#FBA650] rounded-full"></div>
                 <p className="text-2xl font-semibold text-[#FBA650]">
                   기권 {voteResult?.abstainCount}
                 </p>
               </div>
-              <div className="flex felx-row gap-4.5 items-center">
+              <div className="flex flex-row gap-4.5 items-center">
                 <div className="w-[30px] h-[30px]  bg-[#FFFFFF] rounded-full"></div>
                 <p className="text-2xl font-semibold text-[#FFFFFF]">
                   미투표 {attendanceList.length - (voteResult?.totalVotes ?? 0)}
                 </p>
               </div>
             </div>
-            <div className="flex flex-col gap-5 justify-center items-center">
+            <div className="flex flex-col gap-5 justify-center items-center text-center max-w-[calc(100vw-520px)]">
               <p className="text-4xl font-semibold">
                 2026학년도 하반기 정기 전체학생대표자회의
               </p>
@@ -200,7 +200,7 @@ const Result = () => {
               </p>
               <p className="text-4xl font-semibold">{agendaName}</p>
             </div>
-            <div>
+            <div className="absolute right-0 top-0">
               <button
                 onClick={() => navigate('/manager/agendalist')}
                 className="bg-[#A3A3A3] text-white text-xl font-semibold rounded-lg px-4 py-2"
@@ -240,11 +240,11 @@ const Result = () => {
           )}
 
           {state === 'RESULT' && (
-            <div className="flex flex-col gap-10 justify-center items-center mt-20">
+            <div className="flex flex-col gap-10 justify-center items-center mt-20 text-center">
               <p className="text-white text-6xl font-bold">
                 의결권 {votingRightCount}명
               </p>
-              <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-5 items-center">
                 <p className="text-[#57AA5A] text-6xl font-bold">
                   찬성 {voteResult?.agreeCount}명
                 </p>
