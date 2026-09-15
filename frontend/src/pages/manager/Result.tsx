@@ -51,6 +51,13 @@ const Result = () => {
     return 'text-[#fff]';
   };
 
+  const getVoteBgColor = (voteValue: AttendanceVote['voteValue']) => {
+    if (voteValue === 'AGREE') return 'bg-[#57AA5A]';
+    if (voteValue === 'DISAGREE') return 'bg-[#F74040]';
+    if (voteValue === 'ABSTAIN') return 'bg-[#FBA650]';
+    return 'bg-[#fff]';
+  };
+
   useEffect(() => {
     document.body.className = 'pc_black';
   }, []);
@@ -214,12 +221,19 @@ const Result = () => {
                   );
                   const voteValue = attendance?.voteValue ?? null;
                   return (
-                    <p
+                    <div
                       key={user.userId}
-                      className={`text-2xl font-semibold ${getVoteColor(voteValue)}`}
+                      className="flex flex-row gap-2 items-center"
                     >
-                      {user.userName}
-                    </p>
+                      <div
+                        className={`${getVoteBgColor(voteValue)} w-[24px] h-[24px] rounded-full shrink-0`}
+                      ></div>
+                      <p
+                        className={`text-2xl font-semibold ${getVoteColor(voteValue)}`}
+                      >
+                        {user.userName}
+                      </p>
+                    </div>
                   );
                 })}
             </div>
