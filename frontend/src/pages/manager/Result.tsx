@@ -216,7 +216,7 @@ const Result = () => {
                   return (
                     <p
                       key={user.userId}
-                      className={`text-xl font-semibold ${getVoteColor(voteValue)}`}
+                      className={`text-2xl font-semibold ${getVoteColor(voteValue)}`}
                     >
                       {user.userName}
                     </p>
