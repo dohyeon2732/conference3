@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import SearchIcon from '../assets/icons/Search.svg';
 import { useDeptApi } from '../hooks/useDeptApi';
@@ -25,6 +25,7 @@ const PublicAttend = () => {
   const [deptList, setDeptList] = useState<Dept[]>([]);
   const [userList, setUserList] = useState<User[]>([]);
   const [name, setName] = useState('');
+  const previousState = useRef<StateValue | null>(null);
 
   const totalCount = userList.length;
   const attendCount = userList.filter((user) => user.attend).length;
@@ -44,6 +45,21 @@ const PublicAttend = () => {
     [deptList, name, userList],
   );
 
+  const fetchAttendance = async () => {
+    try {
+      const deptRes = await useDeptApi.findAll();
+      const depts: Dept[] = deptRes.data;
+      const userResponses = await Promise.all(
+        depts.map((dept) => useUserApi.findByDept({ deptId: dept.deptId })),
+      );
+
+      setDeptList(depts);
+      setUserList(userResponses.flatMap((res) => res.data));
+    } catch (e) {
+      console.error('출석 명단 조회 실패', e);
+    }
+  };
+
   useEffect(() => {
     document.body.className = '';
   }, []);
@@ -55,7 +71,12 @@ const PublicAttend = () => {
       try {
         const res = await useStateApi.state();
         if (!ignore) {
-          setState(res.data.currentState);
+          const nextState = res.data.currentState;
+          setState(nextState);
+          if (previousState.current !== 'VOTING' && nextState === 'VOTING') {
+            fetchAttendance();
+          }
+          previousState.current = nextState;
         }
       } catch (e) {
         console.error('회의 상태 조회 실패', e);
@@ -74,7 +95,7 @@ const PublicAttend = () => {
   useEffect(() => {
     let ignore = false;
 
-    const fetchAttendance = async () => {
+    const fetchAttendanceIfMounted = async () => {
       try {
         const deptRes = await useDeptApi.findAll();
         const depts: Dept[] = deptRes.data;
@@ -91,8 +112,8 @@ const PublicAttend = () => {
       }
     };
 
-    fetchAttendance();
-    const interval = setInterval(fetchAttendance, 3000);
+    fetchAttendanceIfMounted();
+    const interval = setInterval(fetchAttendanceIfMounted, 3000);
 
     return () => {
       ignore = true;

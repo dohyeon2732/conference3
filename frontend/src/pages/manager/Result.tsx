@@ -185,13 +185,13 @@ const Result = () => {
               </div>
             </div>
             <div className="flex flex-col gap-4 justify-center items-center">
-              <p className="text-3xl font-semibold">
+              <p className="text-4xl font-semibold">
                 2026학년도 하반기 정기 전체학생대표자회의
               </p>
-              <p className=" text-4xl font-bold">
+              <p className=" text-5xl font-bold">
                 {state === 'RESULT' ? '의결 결과' : '의결'}
               </p>
-              <p className="text-2xl font-semibold">{agendaName}</p>
+              <p className="text-4xl font-semibold">{agendaName}</p>
             </div>
             <div>
               <button
