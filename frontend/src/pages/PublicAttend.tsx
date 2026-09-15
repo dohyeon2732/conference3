@@ -124,7 +124,7 @@ const PublicAttend = () => {
   return (
     <div className="flex flex-col w-full min-h-screen bg-white overflow-x-hidden">
       <div className="sticky left-0 top-0 flex flex-col px-5 py-5 sm:px-10 lg:px-16 lg:pt-10 lg:pb-5 w-full gap-4 lg:gap-6 bg-white shadow-[0px_4px_4px_0px_rgba(0,0,0,0.05)] z-10">
-        <div className="font-bold text-xl sm:text-2xl lg:text-3xl leading-tight break-keep">
+        <div className="font-bold text-lg sm:text-2xl lg:text-3xl leading-tight break-keep">
           2026학년도 하반기 전체학생대표자회의 출석 대의원 명부
         </div>
 
@@ -133,7 +133,7 @@ const PublicAttend = () => {
             className={`w-5 h-5 lg:w-[30px] lg:h-[30px] rounded-full shrink-0 ${state === 'PROGRESS' ? 'bg-[#57AA5A]' : state === 'STOP' ? 'bg-[#F74040]' : 'bg-[#FBA650]'}`}
           />
           <p
-            className={`text-xl lg:text-2xl font-bold ${state === 'PROGRESS' ? 'text-[#57AA5A]' : state === 'STOP' ? 'text-[#F74040]' : 'text-[#FBA650]'}`}
+            className={`text-lg sm:text-xl lg:text-2xl font-bold ${state === 'PROGRESS' ? 'text-[#57AA5A]' : state === 'STOP' ? 'text-[#F74040]' : 'text-[#FBA650]'}`}
           >
             {state === 'PROGRESS'
               ? '회의 중'
@@ -149,7 +149,7 @@ const PublicAttend = () => {
             className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6"
           />
           <input
-            className="w-full sm:w-100 h-12 p-3 pl-12 sm:pl-14 bg-zinc-100 rounded-lg text-lg sm:text-xl lg:text-2xl font-bold"
+            className="w-full sm:w-100 h-11 sm:h-12 p-3 pl-12 sm:pl-14 bg-zinc-100 rounded-lg text-base sm:text-xl lg:text-2xl font-bold"
             type="text"
             placeholder="이름으로 검색"
             value={name}
@@ -160,17 +160,17 @@ const PublicAttend = () => {
         </div>
         <div className="flex flex-col xl:flex-row gap-4 xl:gap-5 justify-between xl:items-center">
           <div className="grid grid-cols-2 sm:flex sm:flex-row gap-x-4 gap-y-2 sm:gap-5">
-            <p className="text-lg sm:text-xl lg:text-2xl font-bold">재적 {totalCount}명</p>
-            <p className="text-lg sm:text-xl lg:text-2xl font-bold">
+            <p className="text-base sm:text-xl lg:text-2xl font-bold">재적 {totalCount}명</p>
+            <p className="text-base sm:text-xl lg:text-2xl font-bold">
               개의 정족수 {Math.ceil(totalCount / 2)}명
             </p>
             <div className="hidden sm:block bg-black w-[3px] h-7" />
-            <p className="text-lg sm:text-xl lg:text-2xl font-bold">출석 {attendCount}명</p>
-            <p className="text-lg sm:text-xl lg:text-2xl font-bold">
+            <p className="text-base sm:text-xl lg:text-2xl font-bold">출석 {attendCount}명</p>
+            <p className="text-base sm:text-xl lg:text-2xl font-bold">
               불참 {totalCount - attendCount}명
             </p>
             <div className="hidden sm:block bg-black w-[3px] h-7" />
-            <p className="text-lg sm:text-xl lg:text-2xl font-bold col-span-2">
+            <p className="text-base sm:text-xl lg:text-2xl font-bold col-span-2">
               참석률{' '}
               {totalCount === 0
                 ? '0.00'
@@ -181,11 +181,11 @@ const PublicAttend = () => {
           <div className="flex flex-row gap-5 lg:gap-7 xl:mr-10">
             <div className="flex flex-row gap-2 lg:gap-3.5 items-center">
               <div className="bg-[#57AA5A] w-5 h-5 lg:w-[30px] lg:h-[30px] rounded-full" />
-              <p className="text-[#57AA5A] text-lg sm:text-xl lg:text-2xl font-bold">참석</p>
+              <p className="text-[#57AA5A] text-base sm:text-xl lg:text-2xl font-bold">참석</p>
             </div>
             <div className="flex flex-row gap-2 lg:gap-3.5 items-center">
               <div className="bg-[#F74040] w-5 h-5 lg:w-[30px] lg:h-[30px] rounded-full" />
-              <p className="text-[#F74040] text-lg sm:text-xl lg:text-2xl font-bold">불참</p>
+              <p className="text-[#F74040] text-base sm:text-xl lg:text-2xl font-bold">불참</p>
             </div>
           </div>
         </div>
@@ -197,21 +197,21 @@ const PublicAttend = () => {
             className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center"
             key={dept.deptId}
           >
-            <p className="w-full sm:w-32 lg:w-40 text-xl lg:text-2xl font-bold sm:text-center">
+            <p className="w-full sm:w-32 lg:w-40 text-lg sm:text-xl lg:text-2xl font-bold sm:text-center">
               {dept.deptName}
             </p>
             <div className="flex flex-row flex-1 min-w-0 p-3 bg-[#F1F1F1] rounded-xl gap-2 lg:gap-3 justify-start items-start flex-wrap content-start">
               {(visibleUsersByDept.get(dept.deptId) ?? []).map((user) => (
                 <div
-                  className={`flex flex-col min-w-[92px] sm:min-w-[104px] py-1.5 px-4 lg:px-6 rounded-lg justify-center items-center ${
+                  className={`flex flex-col min-w-[82px] sm:min-w-[104px] py-1.5 px-3 sm:px-4 lg:px-6 rounded-lg justify-center items-center ${
                     user.attend ? 'bg-[#57AA5A]' : 'bg-[#F74040]'
                   }`}
                   key={user.userId}
                 >
-                  <p className="text-base sm:text-lg lg:text-2xl font-bold text-white leading-tight text-center">
+                  <p className="text-sm sm:text-lg lg:text-2xl font-bold text-white leading-tight text-center">
                     {user.userPos}
                   </p>
-                  <p className="text-base sm:text-lg lg:text-2xl font-bold text-white leading-tight text-center">
+                  <p className="text-sm sm:text-lg lg:text-2xl font-bold text-white leading-tight text-center">
                     {user.userName}
                   </p>
                 </div>
