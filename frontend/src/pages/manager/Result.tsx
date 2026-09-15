@@ -184,7 +184,7 @@ const Result = () => {
                 </p>
               </div>
             </div>
-            <div className="flex flex-col gap-4 justify-center items-center">
+            <div className="flex flex-col gap-5 justify-center items-center">
               <p className="text-4xl font-semibold">
                 2026학년도 하반기 정기 전체학생대표자회의
               </p>
