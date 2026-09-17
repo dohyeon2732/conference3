@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import SearchIcon from '../../assets/icons/Search.svg';
 import { useUserApi } from '../../hooks/useUserApi';
@@ -30,6 +30,16 @@ const Attend = () => {
   >([]);
 
   const [name, setName] = useState('');
+
+  const votingRightCount = useMemo(
+    () => userList.filter((user) => !user.emergency).length,
+    [userList],
+  );
+
+  const attendedVotingRightCount = useMemo(
+    () => userList.filter((user) => user.attend && !user.emergency).length,
+    [userList],
+  );
 
   const handleAttendToggle = async (userId: number) => {
     try {
@@ -114,10 +124,17 @@ const Attend = () => {
         </div>
         <div className="flex flex-row gap-5 justify-between items-center">
           {/* 정족수 등 */}
-          <div className="flex flex-row gap-5">
+          <div className="flex flex-row gap-5 flex-wrap">
             <p className="text-2xl font-bold">재적 {totalCount}명</p>
             <p className="text-2xl font-bold">
               개의 정족수 {Math.ceil(totalCount / 2)}명
+            </p>
+            <div className="bg-black w-[3px] h-7" />
+            <p className="text-2xl font-bold">
+              의결권 {votingRightCount}명
+            </p>
+            <p className="text-2xl font-bold">
+              출석 의결권 {attendedVotingRightCount}명
             </p>
             <div className="bg-black w-[3px] h-7" />
             <p className="text-2xl font-bold">출석 {attendCount}명</p>
