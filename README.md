@@ -79,8 +79,6 @@
 
 ## 🖼️ 화면 구성
 
-> 💡 스크린샷을 `docs/images/` 폴더에 추가한 뒤 아래 경로를 교체해 주세요.
-
 | 대의원 로그인 | 대의원 투표 화면 | 공개 출석 현황 |
 | :---: | :---: | :---: |
 | <img src="docs/images/login.png" width="220"> | <img src="docs/images/vote.png" width="220"> | <img src="docs/images/public-attend.png" width="220"> |
@@ -88,6 +86,10 @@
 | 관리자 출석 관리 | 관리자 안건 의결 | 결과 화면 |
 | :---: | :---: | :---: |
 | <img src="docs/images/manager-attend.png" width="280"> | <img src="docs/images/manager-agenda.png" width="280"> | <img src="docs/images/result.png" width="280"> |
+
+| 회원(명부) 관리 | 안건 목록 | 투표 진행 중 집계 |
+| :---: | :---: | :---: |
+| <img src="docs/images/manager-member.png" width="280"> | <img src="docs/images/manager-agendalist.png" width="280"> | <img src="docs/images/result-voting.png" width="280"> |
 
 <br>
 
@@ -373,20 +375,18 @@ ADMIN_PASSWORD='***' USER_PASSWORD='***' k6 run load-tests/vote-150.js
 
 | 이름 | 역할 | 담당 |
 | :---: | :---: | --- |
-| [김도현](https://github.com/dohyeon2732) | Frontend / Backend | 담당 내용을 작성해 주세요 |
-| 이름 | 역할 | 담당 내용 |
+| [김도현](https://github.com/dohyeon2732) | 1인 개발 (Frontend / Backend / Infra) | 기획 및 전체 설계, UI 구현(React · TypeScript · Tailwind CSS), API 서버(Spring Boot · JWT · SSE), DB 설계, 배포(Vercel · AWS EC2), k6 부하 테스트 |
 
 <br>
 
 ## 📅 개발 기간
 
-- `YYYY.MM.DD ~ YYYY.MM.DD`
-- 실제 전학대회 운영 일자: `YYYY.MM.DD`
+- `2026.05.05 ~ 2026.09.17`
+- 실제 전학대회 운영 일자: `2026.09.17`
 
 <br>
 
 ## 📝 회고
 
-<!-- 프로젝트를 하며 겪은 문제와 해결 과정, 배운 점을 간단히 적어 두면 포트폴리오로서 설득력이 커집니다. -->
-- 실시간 동기화 방식을 정하면서 ...
-- 동시 투표 시 중복 저장 문제를 해결하면서 ...
+- **실시간 동기화 방식 선택** — WebSocket과 SSE를 비교한 끝에, 서버 → 클라이언트 단방향 알림만 필요한 서비스 특성상 구현이 가볍고 재연결 처리가 단순한 SSE를 선택했습니다. 회의 상태 / 출석 인원 / 출석 명단 세 개의 스트림으로 나누어 운영하니 화면별로 필요한 이벤트만 구독할 수 있었습니다.
+- **투표 후 새로고침 버그** — 단과대 회장단을 대상으로 한 사전 테스트 중, 투표를 마친 사용자가 결과 페이지에서 새로고침을 하면 기존 표 대신 새로운 표가 생성되어 화면에 투표 내역이 반영되지 않는 오류를 발견했습니다. 기존 표가 있으면 같은 표를 다시 불러와 값만 갱신하도록 API를 수정하고, 유니크 제약(`agenda_id + user_id`, `attendance_id`)과 비관적 락(`SELECT ... FOR UPDATE`)을 함께 적용해 동시 요청에서도 표가 중복 생성되지 않도록 하여 실제 회의 전에 집계 무결성을 지킬 수 있었습니다.
